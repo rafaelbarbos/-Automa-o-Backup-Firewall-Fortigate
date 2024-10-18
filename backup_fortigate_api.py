@@ -12,8 +12,8 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 def enviar_email(resultados_backup, destinatarios):
     server_smtp = 'smtp.office365.com'
     port = 587
-    sender_email = ''  # Use variáveis de ambiente para o email do remetente
-    password = ''      # Use variáveis de ambiente para a senha
+    sender_email = 'email_remente@gmail.com'  # Use variáveis de ambiente para o email do remetente
+    password = 'sua_senha'      # Use variáveis de ambiente para a senha
 
     subject = 'Resumo dos Backups de Firewalls Accerte'
 
@@ -47,7 +47,7 @@ def enviar_email(resultados_backup, destinatarios):
         </style>
     </head>
     <body>
-        <h2>Resumo dos Backups Semanais de Firewalls Accerte</h2>
+        <h2>Resumo dos Backups Semanais de Firewalls</h2>
         <p>Olá,</p>
         <p>Aqui está o resumo dos backups de firewalls realizados:</p>
         <table>
@@ -83,7 +83,7 @@ def enviar_email(resultados_backup, destinatarios):
 
 # Função para realizar o backup de um firewall usando token
 def backup_firewall(firewall_url, token):
-    backup_url = f'https://{firewall_url}:14443/api/v2/monitor/system/config/backup?scope=global'
+    backup_url = f'https://{firewall_url}/api/v2/monitor/system/config/backup?scope=global' #Caso o firewall utilize portas, adicione na url
 
     # Headers da requisição
     headers = {
@@ -117,24 +117,26 @@ def backup_firewall(firewall_url, token):
         return f"<tr><td>{firewall_url}</td><td style='color:red;'>Erro: {e}</td></tr>\n"
 
 # Função principal para processar os backups e enviar o relatório
-def processar_backups(firewalls, token):
+def processar_backups(firewalls):
     resultados_backup = ""  # Armazenar resultados dos backups
 
-    for firewall_url in firewalls:
+    for firewall in firewalls:
+        firewall_url = firewall['url']
+        token = firewall['token']
         resultado = backup_firewall(firewall_url, token)
         resultados_backup += resultado
 
     # Definir destinatários do resumo de backups de firewalls
-    destinatarios = ['rafael.silva@accerte.com.br']  # Pode adicionar mais emails
+    destinatarios = ['seu_email@gmail.com']  # Pode adicionar mais emails
 
     # Enviar email com o resumo dos backups em formato HTML
     enviar_email(resultados_backup, destinatarios)
 
 # Lista de URLs/IPs dos firewalls
 firewalls = [
-    {'url': 'IP_DO_FIREWALL_1', 'token': 'TOKEN_DO_FIREWALL_1'},
-    {'url':'IP_DO_FIREWALL_2', 'token': 'TOKEN_DO_FIREWALL_2' }, # Adicione quantos firewall e tokens forem necessários
+    {'url':'IP_DO_FIREWALL_1', 'token': 'TOKEN_DO_FIREWALL_1'},
+    {'url':'IP_DO_FIREWALL_2', 'token': 'TOKEN_DO_FIREWALL_2'}, # Adicione quantos firewall e tokens forem necessários
 ]
 
 # Executar o processo de backups
-processar_backups(firewalls, token)
+processar_backups(firewalls)
